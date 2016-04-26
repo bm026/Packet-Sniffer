@@ -1,3 +1,5 @@
 # Keep log files away from GitHub..!
-
 *.log
+
+# Don't bother with testing executables
+a.out
