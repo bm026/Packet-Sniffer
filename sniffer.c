@@ -46,12 +46,19 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
   int tcp_header_length, total_header_size, packet_data_length;
   struct in_addr inet_ip;
 
-  printf("=== Got a %d byte packet ===\n", cap_header->len);
+  //printf("=== Got a %d byte packet ===\n", cap_header->len);
+  time_t t = time(NULL);
+  struct tm tm = *localtime(&t);
+  char time_string[30];
+
+  sprintf(time_string, "%d-%02d-%02d %02d:%02d:%02d\n", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+  printf("%s\n", time_string);
 
   // get IP addresses of packet
   const u_char *ip_hdr_start = packet + ETHER_HDR_LEN;
   ip_header = (const struct ip_hdr *) ip_hdr_start;
 
+  // print source and destination IPs
   inet_ip.s_addr = ip_header->ip_src_addr;
   printf("Source:\t\t%s\n", inet_ntoa(inet_ip));
   inet_ip.s_addr = ip_header->ip_dest_addr;
