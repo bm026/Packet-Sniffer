@@ -21,14 +21,16 @@ int main (int argc, char *argv[]) {
   printf("Sniffing on device %s\n", device);
 
   // opens packet-capturing device in promiscuous mode with
-  // maximum packet size 4096 bits
+  // maximum packet size 4096 bytes
   pcap_handle = pcap_open_live(device, 4096, 1, 0, errbuf);
   if (pcap_handle == NULL)
     fatal("in pcap_open_live");
 
   // captures 10 packets
   for (i=0; i<10; i++) {
-    packet = pcap_next(pcap_handle, &header);
+    do {
+      packet = pcap_next(pcap_handle, &header);
+    } while (header.len == 0);
     printf("Got a %d byte packet.\n", header.len);
   }
 
