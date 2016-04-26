@@ -46,6 +46,8 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
   int tcp_header_length, total_header_size, packet_data_length;
   struct in_addr inet_ip;
   struct in_addr inet_ip_this;
+  char l_time[30];
+  char l_ip[20];
 
   //printf("=== Got a %d byte packet ===\n", cap_header->len);
 
@@ -61,18 +63,18 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
 
   // only logs packets with destination 192.168.1.35
   if (inet_aton("192.168.1.35", &inet_ip_this) == 0) fatal("in IP conversion");
+
+  // if destination address is 192.168.1.35
   if (inet_ip_this.s_addr == ip_header->ip_dest_addr) {
 
-    // create timestamp
+    // create new timestamp
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    char time_string[30];
-    sprintf(time_string, "%d-%02d-%02d %02d:%02d:%02d >", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
-    printf("%s\t", time_string);
-    
+    sprintf(l_time, "%d-%02d-%02d %02d:%02d:%02d >", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
     // get source IP address
     inet_ip.s_addr = ip_header->ip_src_addr;
-    printf("%s\t", inet_ntoa(inet_ip));
+    sprintf(l_ip, "%s", inet_ntoa(inet_ip));
 
     // get length of TCP header
     const u_char *tcp_hdr_start = packet + ETHER_HDR_LEN + sizeof(struct ip_hdr);
@@ -83,22 +85,48 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
     total_header_size = ETHER_HDR_LEN + sizeof(struct ip_hdr) + tcp_header_length;
     packet_data_length = cap_header->len - total_header_size;
 
-    // if data, print size
-    if (packet_data_length > 0) {
-      //printf("Data:\t\t%d bytes\n\n", packet_data_length);
-      printf("%d bytes\t", packet_data_length);
-    }
-    // if no data, print flags
-    else {
-      printf("No data. Flags: ");
+    // if packet has no data, print all log entries
+    if (packet_data_length <= 0) {
+
+      if (is_log) {
+        printf("%s\t%s\t\t%d bytes", g_time, g_ip, g_total_bytes);
+        if (g_total_packets > 1) printf(" (%d packets)", g_total_packets);
+        printf("\n");
+      }
+      printf("%s\t%s\t\t", l_time, l_ip);
       if (tcp_header->tcp_flags & TCP_FIN) printf("FIN ");
       if (tcp_header->tcp_flags & TCP_SYN) printf("SYN ");
       if (tcp_header->tcp_flags & TCP_RST) printf("RST ");
       if (tcp_header->tcp_flags & TCP_PUSH) printf("PUSH ");
       if (tcp_header->tcp_flags & TCP_ACK) printf("ACK ");
       if (tcp_header->tcp_flags & TCP_URG) printf("URG");
-      //printf("\n\n");
+      printf("\n");
+      prev_ip = 0;
+      is_log = 0;
     }
-    printf("\n");
+
+    // if packet has data is from same IP address as previous, update variables
+    else if (ip_header->ip_src_addr == prev_ip) {
+
+      g_total_bytes += packet_data_length;
+      g_total_packets++;
+    }
+
+    // if packet is from new IP address, print previous log entry and reset variables
+    else {
+
+      if (is_log) {
+        printf("%s\t%s\t\t%d bytes", g_time, g_ip, g_total_bytes);
+        if (g_total_packets > 1) printf(" (%d packets)", g_total_packets);
+        printf("\n");
+      }
+      is_log = 1;
+      strcpy(g_time, l_time);
+      strcpy(g_ip, l_ip);
+      g_total_bytes = packet_data_length;
+      g_total_packets = 1;
+    }
+
+    prev_ip = ip_header->ip_src_addr;
   }
 }

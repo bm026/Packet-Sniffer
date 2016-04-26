@@ -52,6 +52,13 @@ struct tcp_hdr {
   unsigned short tcp_urgent;    // TCP urgent pointer
 };
 
+// global variables
+unsigned int prev_ip = 0;
+int g_total_packets, g_total_bytes;
+char g_time[30];
+char g_ip[20];
+char is_log = 0;
+
 // prints program usage and then exits
 void usage (char *prog_name) {
   printf("\nUsage:  %s [-i]\n\n", prog_name);
