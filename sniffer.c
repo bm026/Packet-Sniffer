@@ -31,7 +31,8 @@ int main (int argc, char *argv[]) {
     do {
       packet = pcap_next(pcap_handle, &header);
     } while (header.len == 0);
-    printf("Got a %d byte packet.\n", header.len);
+    printf("\nGot a %d byte packet.\n%s\n", header.len, (char *)packet);
+    header.len = 0;
   }
 
   // closes the capturing interface
