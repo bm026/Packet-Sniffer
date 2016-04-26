@@ -47,29 +47,6 @@ int main (int argc, char *argv[]) {
   return 0;
 }
 
-void *print_ip(unsigned int addr) {
-  int ip[4];
-  char ip_string[20];
-  char itoa[4];
-  unsigned int ip_whole = ntohl(addr);
-  ip[0] = ip_whole >> 24;
-  ip[1] = (ip_whole >> 16) & 0xff;
-  ip[2] = (ip_whole >> 8) & 0xff;
-  ip[3] = ip_whole & 0xff;
-  sprintf(itoa, "%d", ip[0]);
-  strcpy(ip_string, itoa);
-  strncat(ip_string, ".", 1);
-  sprintf(itoa, "%d", ip[1]);
-  strcat(ip_string, itoa);
-  strncat(ip_string, ".", 1);
-  sprintf(itoa, "%d", ip[2]);
-  strcat(ip_string, itoa);
-  strncat(ip_string, ".", 1);
-  sprintf(itoa, "%d", ip[3]);
-  strcat(ip_string, itoa);
-  printf("%s", ip_string);
-}
-
 // deals with captured raw data packets
 void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, const u_char *packet) {
 
@@ -83,17 +60,17 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
   const u_char *ip_hdr_start = packet + ETHER_HDR_LEN;
   ip_header = (const struct ip_hdr *) ip_hdr_start;
 
-  printf("Source:\t\t"); //inet_ntoa(ip_header->ip_src_addr));
-  print_ip(ip_header->ip_src_addr); printf("\n");
-  printf("Destination:\t"); //inet_ntoa(ip_header->ip_dest_addr));
-  print_ip(ip_header->ip_dest_addr); printf("\n");
+  printf("Source:\t\t");
+  print_ipv4(ip_header->ip_src_addr); printf("\n");
+  printf("Destination:\t");
+  print_ipv4(ip_header->ip_dest_addr); printf("\n");
 
   // get length of TCP header
   const u_char *tcp_hdr_start = packet + ETHER_HDR_LEN + sizeof(struct ip_hdr);
   tcp_header = (const struct tcp_hdr *) tcp_hdr_start;
   tcp_header_length = 4 * tcp_header->tcp_offset;
 
-  // get data
+  // get data size
   total_header_size = ETHER_HDR_LEN + sizeof(struct ip_hdr) + tcp_header_length;
   packet_data_length = cap_header->len - total_header_size;
 

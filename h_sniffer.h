@@ -75,3 +75,23 @@ void *challoc (unsigned int size) {
   }
   return ptr;
 }
+
+// converts IP address from network to host order,
+// then prints as a readable string (inet_ntoa)
+void print_ipv4(unsigned int addr) {
+  int i, ip[4];
+  char ip_string[20];
+  char itoa[4];
+  unsigned int ip_whole = ntohl(addr);
+  ip[0] = ip_whole >> 24;
+  ip[1] = (ip_whole >> 16) & 0xff;
+  ip[2] = (ip_whole >> 8) & 0xff;
+  ip[3] = ip_whole & 0xff;
+  ip_string[0] = '\0';
+  for (i=0; i<4; i++) {
+    sprintf(itoa, "%d", ip[i]);
+    strcat(ip_string, itoa);
+    if (i != 3) strncat(ip_string, ".", 1);
+  }
+  printf("%s", ip_string);
+}
