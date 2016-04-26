@@ -6,5 +6,5 @@ A basic system daemon that logs all incoming and outgoing packets from a machine
 
 Requires libpcap.
 
-  $ gcc -o sniffer sniffer.c -l pcap
-  $ sudo ./sniffer
+$ gcc -o sniffer sniffer.c -l pcap  
+$ sudo ./sniffer
