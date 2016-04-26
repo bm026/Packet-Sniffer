@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pcap.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 // ethernet length values
 #define ETHER_ADDR_LEN 6
@@ -12,7 +15,7 @@ struct ether_hdr {
   unsigned char ether_dest_addr[ETHER_ADDR_LEN]; // destination MAC address
   unsigned char ether_src_addr[ETHER_ADDR_LEN];  // source MAC address
   unsigned short ether_type;                     // type of ethernet packet
-}
+};
 
 // ip header struct
 struct ip_hdr {
@@ -26,7 +29,7 @@ struct ip_hdr {
   unsigned short ip_checksum;                 // checksum
   unsigned int ip_src_addr;                   // source IP address
   unsigned int ip_dest_addr;                  // destination IP address
-}
+};
 
 // tcp header struct
 struct tcp_hdr {
@@ -37,17 +40,16 @@ struct tcp_hdr {
   unsigned char reserved:4;     // 4 bits of the 6 bits of reserved space
   unsigned char tcp_offset:4;   // TCP data offset for little endian host
   unsigned char tcp_flags;      // TCP flags (and the remaining 2 bits of reserved space)
-#define TCP_FIN  0x01;
-#define TCP_SYN  0x02;
-#define TCP_RST  0x04;
-#define TCP_PUSH 0x08;
-#define TCP_ACK  0x10;
-#define TCP_URG  0x20;
+#define TCP_FIN  0x01
+#define TCP_SYN  0x02
+#define TCP_RST  0x04
+#define TCP_PUSH 0x08
+#define TCP_ACK  0x10
+#define TCP_URG  0x20
   unsigned short tcp_window;    // TCP window size
   unsigned short tcp_checksum;  // TCP checksum
   unsigned short tcp_urgent;    // TCP urgent pointer
-
-}
+};
 
 // prints program usage and then exits
 void usage (char *prog_name) {
