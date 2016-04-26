@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <pcap.h>
+
 // prints program usage and then exits
 void usage (char *prog_name) {
   printf("\nUsage:  %s [-i]\n\n", prog_name);
