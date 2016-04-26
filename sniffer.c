@@ -29,15 +29,6 @@ int main (int argc, char *argv[]) {
   if (pcap_handle == NULL)
     fatal("in pcap_open_live");
 
-  // captures 10 packets
-  /*for (i=0; i<10; i++) {
-    do {
-      packet = pcap_next(pcap_handle, &header);
-    } while (header.len == 0);
-    printf("Got a %d byte packet.\n%s\n\n", header.len, (char *)packet);
-    header.len = 0;
-  }*/
-
   // captures packets until ^C
   pcap_loop(pcap_handle, -1, caught_packet, NULL);
 
@@ -53,6 +44,7 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
   const struct ip_hdr *ip_header;
   const struct tcp_hdr *tcp_header;
   int tcp_header_length, total_header_size, packet_data_length;
+  struct in_addr inet_ip;
 
   printf("=== Got a %d byte packet ===\n", cap_header->len);
 
@@ -60,10 +52,10 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
   const u_char *ip_hdr_start = packet + ETHER_HDR_LEN;
   ip_header = (const struct ip_hdr *) ip_hdr_start;
 
-  printf("Source:\t\t");
-  print_ipv4(ip_header->ip_src_addr); printf("\n");
-  printf("Destination:\t");
-  print_ipv4(ip_header->ip_dest_addr); printf("\n");
+  inet_ip.s_addr = ip_header->ip_src_addr;
+  printf("Source:\t\t%s\n", inet_ntoa(inet_ip));
+  inet_ip.s_addr = ip_header->ip_dest_addr;
+  printf("Destination:\t%s\n", inet_ntoa(inet_ip));
 
   // get length of TCP header
   const u_char *tcp_hdr_start = packet + ETHER_HDR_LEN + sizeof(struct ip_hdr);
