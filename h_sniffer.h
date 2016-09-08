@@ -86,6 +86,7 @@ void *challoc (unsigned int size) {
 
 // converts IP address from network to host order,
 // then prints as a readable string (inet_ntoa)
+// _defunct_
 void print_ipv4(unsigned int addr) {
   int i, ip[4];
   char ip_string[20];

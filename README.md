@@ -1,6 +1,6 @@
 ### Packet Sniffer
 
-A basic system daemon that logs all incoming and outgoing packets from a machine. Wireshark v0.1, basically.
+A tool that inspects all incoming packets to a machine. Wireshark v0.0.1, basically.
 
 #### Usage
 

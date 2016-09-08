@@ -70,7 +70,7 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
     // create new timestamp
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    sprintf(l_time, "%d-%02d-%02d %02d:%02d:%02d >", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    sprintf(l_time, "%d-%02d-%02d %02d:%02d:%02d>", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
 
     // get source IP address
     inet_ip.s_addr = ip_header->ip_src_addr;
@@ -85,7 +85,7 @@ void caught_packet(u_char *user_args, const struct pcap_pkthdr *cap_header, cons
     total_header_size = ETHER_HDR_LEN + sizeof(struct ip_hdr) + tcp_header_length;
     packet_data_length = cap_header->len - total_header_size;
 
-    // if packet has no data, print all log entries
+    // if packet has no data, packet is a flag. Print all log entries
     if (packet_data_length <= 0) {
 
       if (is_log) {
